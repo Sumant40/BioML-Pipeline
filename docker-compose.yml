@@ -1,0 +1,102 @@
+version: "3.9"
+
+volumes:
+  bioml_data:
+  bioml_models:
+
+services:
+
+  datagen:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./data:/app/data
+      - bioml_data:/app/data/output
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "pip install --quiet --no-cache-dir
+             pandas==2.2.2
+             numpy==1.26.4 &&
+             python data/generate_data.py"
+
+  spark:
+    image: bitnami/spark:3.5
+    working_dir: /app
+    user: root
+    volumes:
+      - ./spark_pipeline:/app/spark_pipeline
+      - bioml_data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
+    command: >
+      sh -c "pip install --quiet --no-cache-dir
+             pandas==2.2.2
+             scikit-learn==1.4.2 &&
+             python spark_pipeline/preprocess.py"
+    depends_on:
+      datagen:
+        condition: service_completed_successfully
+
+  tensorflow:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./tf_model:/app/tf_model
+      - bioml_data:/app/data
+      - bioml_models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TF_CPP_MIN_LOG_LEVEL=3
+      - CUDA_VISIBLE_DEVICES=""
+    command: >
+      sh -c "pip install --quiet --no-cache-dir
+             tensorflow-cpu==2.16.1
+             scikit-learn==1.4.2
+             pandas==2.2.2
+             numpy==1.26.4 &&
+             python tf_model/train_tf.py"
+    depends_on:
+      spark:
+        condition: service_completed_successfully
+
+  pytorch:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./pytorch_model:/app/pytorch_model
+      - bioml_data:/app/data
+      - bioml_models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "pip install --quiet --no-cache-dir
+             torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu &&
+             pip install --quiet --no-cache-dir
+             pandas==2.2.2
+             numpy==1.26.4 &&
+             python pytorch_model/train_pytorch.py"
+    depends_on:
+      spark:
+        condition: service_completed_successfully
+
+  ensemble:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./ensemble:/app/ensemble
+      - bioml_models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "pip install --quiet --no-cache-dir
+             numpy==1.26.4
+             scikit-learn==1.4.2 &&
+             python ensemble/predict.py"
+    depends_on:
+      tensorflow:
+        condition: service_completed_successfully
+      pytorch:
+        condition: service_completed_successfully

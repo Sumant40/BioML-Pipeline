@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+models/
+data/processed/
+data/gene_expression.csv
+.DS_Store
