@@ -8,7 +8,7 @@ from pyspark.ml.feature import VectorAssembler, StandardScaler
 from pyspark.ml import Pipeline
 import pandas as pd
 
-os.makedirs("data/processed", exist_ok=True)
+os.makedirs("/app/data/processed", exist_ok=True)
 
 spark = SparkSession.builder \
     .appName("GeneExpressionPreprocessing") \
@@ -19,7 +19,7 @@ spark = SparkSession.builder \
 spark.sparkContext.setLogLevel("ERROR")
 print("🔥 PySpark session started")
 
-df = spark.read.csv("data/gene_expression.csv", header=True, inferSchema=True)
+df = spark.read.csv("/app/data/gene_expression.csv", header=True, inferSchema=True)
 print(f"   Loaded: {df.count()} rows x {len(df.columns)} columns")
 
 df = df.dropna()
@@ -45,8 +45,8 @@ def save_partition(spark_df, path):
     out.to_csv(path, index=False)
     print(f"   Saved {len(out)} rows → {path}")
 
-save_partition(train_df, "data/processed/train.csv")
-save_partition(test_df,  "data/processed/test.csv")
+save_partition(train_df, "bioml-pipeline\data\processedtrain.csv")
+save_partition(test_df,  "bioml-pipeline\data\processedtest.csv")
 
 spark.stop()
 print("✅ PySpark preprocessing complete")
