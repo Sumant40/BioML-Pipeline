@@ -184,7 +184,7 @@ docker compose version
 
 ```bash
 # If using git
-git clone <your-repo-url>
+git clone https://github.com/Sumant40/BioML-Pipeline.git
 cd bioml-pipeline
 
 # Or just create the folder and add all files manually
