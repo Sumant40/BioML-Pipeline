@@ -4,3 +4,4 @@ models/
 data/processed/
 data/gene_expression.csv
 .DS_Store
+*.csv

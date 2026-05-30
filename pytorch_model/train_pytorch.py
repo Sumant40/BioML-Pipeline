@@ -42,7 +42,7 @@ y_test  = test["cancer_type"].values.astype(np.int64)
 train_loader = DataLoader(GeneDataset(X_train, y_train), batch_size=32, shuffle=True)
 test_loader  = DataLoader(GeneDataset(X_test,  y_test),  batch_size=64, shuffle=False)
 
-model     = CancerMLP(X_train.shape[1], 3).to(DEVICE)
+model     = CancerMLP(X_train.shape[1], 5).to(DEVICE)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)

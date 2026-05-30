@@ -1,7 +1,14 @@
 import numpy as np
 from sklearn.metrics import classification_report
 
-CANCER_NAMES = {0: "BRCA (Breast)", 1: "LUAD (Lung)", 2: "PRAD (Prostate)"}
+CANCER_NAMES = {
+    0: "BRCA (Breast)",
+    1: "KIRC (Kidney)",
+    2: "COAD (Colon)",
+    3: "LUAD (Lung)",
+    4: "PRAD (Prostate)",
+}
+
 
 print("🔬 Ensemble prediction")
 
@@ -23,7 +30,7 @@ print(f"   Ensemble    accuracy : {acc(ensemble_preds, true_labels):.1f}%")
 print("\n📊 Classification report (Ensemble):")
 print(classification_report(
     true_labels, ensemble_preds,
-    target_names=[CANCER_NAMES[i] for i in range(3)]
+    target_names=[CANCER_NAMES[i] for i in range(5)]
 ))
 
 print("🧬 Sample predictions (first 10 test patients):")

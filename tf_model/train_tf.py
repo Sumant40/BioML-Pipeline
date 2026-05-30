@@ -27,7 +27,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Dropout(0.2),
     tf.keras.layers.Dense(64, activation="relu"),
-    tf.keras.layers.Dense(3, activation="softmax"),
+    tf.keras.layers.Dense(5, activation="softmax"),
 ])
 
 model.compile(optimizer="adam",
